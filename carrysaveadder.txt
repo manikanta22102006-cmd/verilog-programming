@@ -1,0 +1,91 @@
+`timescale 1ns / 1ps
+
+module fulladder (
+    input a, 
+    input b, 
+    input cin, 
+    output s,
+    output cout
+);
+    assign s = a ^ b ^ cin;
+    assign cout = (a & b) | (b & cin) | (a & cin);
+endmodule
+
+module mux (
+    input a,
+    input b, 
+    input sel, 
+    output reg y
+);
+    always @(*) begin
+        if (sel == 0)
+            y = a;
+        else
+            y = b;
+    end
+endmodule
+
+module cs_adder (
+    input [3:0] a,
+    input [3:0] b,
+    input cin, 
+    output [3:0] s, 
+    output cout
+);
+    wire [3:0] w1, w2, cl, c2;
+
+    fulladder FA1(a[0], b[0], 1'b0, w1[0], cl[0]);
+    fulladder FA2(a[1], b[1], cl[0], w1[1], cl[1]);
+    fulladder FA3(a[2], b[2], cl[1], w1[2], cl[2]);
+    fulladder FA4(a[3], b[3], cl[2], w1[3], cl[3]);
+
+    fulladder FA5(a[0], b[0], 1'b1, w2[0], c2[0]);
+    fulladder FA6(a[1], b[1], c2[0], w2[1], c2[1]);
+    fulladder FA7(a[2], b[2], c2[1], w2[2], c2[2]);
+    fulladder FA8(a[3], b[3], c2[2], w2[3], c2[3]);
+
+    mux m1(w1[0], w2[0], cin, s[0]);
+    mux m2(w1[1], w2[1], cin, s[1]);
+    mux m3(w1[2], w2[2], cin, s[2]);
+    mux m4(w1[3], w2[3], cin, s[3]);
+    mux m5(cl[3], c2[3], cin, cout);
+
+endmodule
+`timescale 1ns / 1ps
+
+module tb_cs_adder;
+
+    reg [3:0] a, b;
+    reg cin;
+    wire [3:0] s;
+    wire cout;
+
+    cs_adder uut(
+        .a(a),
+        .b(b),
+        .cin(cin),
+        .s(s),
+        .cout(cout)
+    );
+
+    initial begin
+        $dumpfile("waveform.vcd");
+        $dumpvars(0, tb_cs_adder);
+        
+        $monitor("a=%b, b=%b, cin=%b, s=%b, cout=%b", a, b, cin, s, cout);
+
+        a = 4'b0000; b = 4'b0001; cin = 1'b0; #2;
+        a = 4'b0001; b = 4'b0010; cin = 1'b1; #2;
+        a = 4'b0010; b = 4'b0011; cin = 1'b0; #2;
+        a = 4'b0011; b = 4'b0100; cin = 1'b1; #2;
+        a = 4'b0100; b = 4'b0101; cin = 1'b0; #2;
+        a = 4'b0101; b = 4'b0110; cin = 1'b1; #2;
+        a = 4'b0110; b = 4'b0111; cin = 1'b0; #2;
+        a = 4'b0111; b = 4'b1000; cin = 1'b1; #2;
+        a = 4'b1000; b = 4'b1001; cin = 1'b0; #2;
+        a = 4'b1001; b = 4'b1010; cin = 1'b1; #2;
+
+        $finish;
+    end
+
+endmodule

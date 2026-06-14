@@ -1,0 +1,22 @@
+RTL CODE:-
+`timescale 1ns / 1ps
+module decoder_5x32(input [4:0] a,output [31:0] y);
+assign y = 32'b1 << a;
+endmodule
+
+Test bench code:-
+`timescale 1ns / 1ps
+module tb_decoder_5x32;
+reg [4:0] a;
+wire [31:0] y;
+decoder_5x32 uut(.a(a),.y(y));
+integer i;
+initial begin
+    $monitor("a=%d y=%b", a, y);
+    for(i=0; i<32; i=i+1) begin
+        a = i;
+        #10;
+    end
+    $finish;
+end
+endmodule

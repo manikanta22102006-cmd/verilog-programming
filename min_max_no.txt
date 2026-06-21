@@ -1,0 +1,35 @@
+RTL CODE:-
+`timescale 1ns / 1ps
+module min_max(input  [3:0] a,b,output reg [3:0] min,output reg [3:0] max);
+always @(*) begin
+    if (a > b) begin
+        max = a;
+        min = b;
+    end
+    else begin
+        max = b;
+        min = a;
+    end
+end
+endmodule
+
+Test bench code:-
+`timescale 1ns / 1ps
+module tb_min_max;
+    reg  [3:0] a, b;
+    wire [3:0] min, max;
+    integer i;
+    min_max uut (.a(a),.b(b),.min(min),.max(max));
+    initial begin
+        for(i = 0; i < 15; i = i + 1) begin
+            a = $random;
+            b = $random;
+            #10;
+        end
+        $finish;
+    end
+    initial begin
+        $monitor("Time=%0t a=%d b=%d min=%d max=%d",
+                  $time, a, b, min, max);
+    end
+endmodule

@@ -1,0 +1,26 @@
+RTL CODE:-
+
+`timescale 1ns / 1ps
+module cmos_inverter(input a,output o);
+    supply1 p;
+    supply0 g;
+    pmos(o,p,a);
+    nmos(o,g,a);
+endmodule
+
+Test bench code:-
+`timescale 1ns / 1ps
+
+module tb_cmos_inverter;
+    reg a;
+    wire o;
+    cmos_inverter uut (.a(a),.o(o));
+    initial begin
+      $dumpfile("cmos_inverter.vcd");
+        $dumpvars(0, tb_cmos_inverter);
+        $monitor("Time=%0t a=%b o=%b", $time, a, o);
+        a = 0; #10;
+        a = 1; #10;
+        $finish;
+    end
+endmodule_

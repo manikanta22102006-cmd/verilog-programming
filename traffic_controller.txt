@@ -1,0 +1,72 @@
+RTL CODE:-
+`timescale 1ns / 1ps
+module traffic_light_controller(input clk,rst,output reg [2:0] roadA,roadB);
+reg [1:0] state;
+parameter S0 = 2'b00,
+          S1 = 2'b01,
+          S2 = 2'b10,
+          S3 = 2'b11;
+// State Transition
+always @(posedge clk or posedge rst)
+begin
+    if(rst)
+        state <= S0;
+    else
+        case(state)
+            S0: state <= S1;
+            S1: state <= S2;
+            S2: state <= S3;
+            S3: state <= S0;
+        endcase
+end
+// Output Logic
+always @(*)
+begin
+    case(state)
+        S0: begin
+            roadA = 3'b100; // Green
+            roadB = 3'b001; // Red
+        end
+        S1: begin
+            roadA = 3'b010; // Yellow
+            roadB = 3'b001; // Red
+        end
+        S2: begin
+            roadA = 3'b001; // Red
+            roadB = 3'b100; // Green
+        end
+        S3: begin
+            roadA = 3'b001; // Red
+            roadB = 3'b010; // Yellow
+        end
+    endcase
+end
+endmodule
+
+Test bench code:-
+`timescale 1ns/1ps
+module tb_sequence_detector;
+reg clk, rst, x;
+wire y;
+sequence_detector uut(.clk(clk),.rst(rst),.x(x),.y(y));
+always #5 clk = ~clk;
+initial begin
+    clk = 0;
+    rst = 1;
+    x = 0;
+    #10 rst = 0;
+    x = 1; #10;
+    x = 0; #10;
+    x = 1; #10;
+    x = 1; #10;  
+    x = 0; #10;
+    x = 1; #10;
+    x = 1; #10;
+    #20 $finish;
+end
+initial begin
+    $dumpfile("sequence_detector.vcd");
+    $dumpvars(0, tb_sequence_detector);
+    $monitor("time=%0t x=%b y=%b", $time, x, y);
+end
+endmoduleD

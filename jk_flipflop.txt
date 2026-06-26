@@ -1,0 +1,39 @@
+RTL CODE:-
+`timescale 1ns / 1ps
+module jk_flipflop(input clk,j,k,output reg q);
+always @(posedge clk)
+begin
+    case ({j,k})
+        2'b00: q <= q;      // Hold
+        2'b01: q <= 1'b0;   // Reset
+        2'b10: q <= 1'b1;   // Set
+        2'b11: q <= ~q;     // Toggle
+    endcase
+end
+endmodule
+
+Test bench code:-
+`timescale 1ns / 1ps
+module tb_jk_flipflop;
+reg clk, j, k;
+wire q;
+jk_flipflop uut(.clk(clk),.j(j),.k(k),.q(q));
+initial
+begin
+    clk = 0;
+    forever #5 clk = ~clk;
+end
+initial
+begin
+    $dumpfile("jk_flipflop.vcd");
+    $dumpvars(0, tb_jk_flipflop);
+    $monitor("Time=%0t J=%b K=%b Q=%b", $time, j, k, q);
+    j=0; k=0; #10;   // Hold
+    j=1; k=0; #10;   // Set
+    j=0; k=1; #10;   // Reset
+    j=1; k=1; #10;   // Toggle
+    j=1; k=1; #10;   // Toggle again
+    j=0; k=0; #10;   // Hold
+    $finish;
+end
+endmodule

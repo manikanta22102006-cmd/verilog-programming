@@ -1,0 +1,32 @@
+RTL CODE:-
+`timescale 1ns / 1ps
+module d_flipflop(input clk,d,output reg q);
+    always@(posedge clk)
+    begin
+    q<=d;
+    end 
+endmodule
+
+Test bench code:-
+`timescale 1ns / 1ps
+module tb_d_flipflop;
+reg clk, d;
+wire q;
+d_flipflop uut(.clk(clk),.d(d),.q(q));
+initial
+begin
+    clk = 0;
+    forever #5 clk = ~clk;
+end
+initial
+begin
+    $monitor("clk=%b d=%b q=%b", clk, d, q);
+    d = 0; #10;
+    d = 1; #10;
+    d = 0; #10;
+    d = 1; #10;
+    d = 1; #10;
+    d = 0; #10;
+    $finish;
+end
+endmodule

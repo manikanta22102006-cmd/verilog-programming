@@ -1,0 +1,43 @@
+RTL CODE:-
+`timescale 1ns / 1ps
+module ram_32_bit(input clk,we,input [4:0]addr,input [31:0] din,output reg [31:0] dout);
+    reg [31:0] mem [31:0];
+    always@(posedge clk)begin
+    if(we)
+    mem[addr]<=din;
+    end
+    always@(*)
+    dout=mem[addr];    
+endmodule
+
+Test bench code:-
+`timescale 1ns / 1ps
+module tb_ram_32_bit;
+reg clk,we;
+reg [4:0] addr;
+reg [31:0] din;
+wire [31:0] dout;
+ram_32_bit uut(.clk(clk),.we(we),.addr(addr),.din(din),.dout(dout));
+always #5 clk = ~clk;
+initial
+begin
+    clk = 0;
+    we = 0;
+    addr = 0;
+    din = 0;
+    we = 1;
+    addr = 5'd0; din = 32'h12345678; #10;
+    addr = 5'd1; din = 32'hABCDEF12; #10;
+    addr = 5'd2; din = 32'h87654321; #10;
+    we = 0;
+    addr = 5'd0; #10;
+    addr = 5'd1; #10;
+    addr = 5'd2; #10;
+    $finish;
+end
+initial
+begin
+    $monitor("Time=%0t we=%b addr=%d din=%h dout=%h",
+              $time,we,addr,din,dout);
+end
+endmodule

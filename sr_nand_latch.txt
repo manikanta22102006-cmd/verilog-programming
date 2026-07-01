@@ -1,0 +1,31 @@
+RTL CODE:-
+`timescale 1ns / 1ps
+module sr_gated_nand_latch(input S,R,EN,output Q,Qbar);
+wire Sn, Rn;
+assign Sn = ~(S & EN);
+assign Rn = ~(R & EN);
+assign Q    = ~(Sn & Qbar);
+assign Qbar = ~(Rn & Q);
+endmodule
+
+Test bench code:-
+`timescale 1ns / 1ps
+module tb_sr_gated_nand_latch;
+reg S, R, EN;
+wire Q, Qbar;
+sr_gated_nand_latch uut (.S(S),.R(R),.EN(EN),.Q(Q),.Qbar(Qbar));
+initial begin
+    $dumpfile("sr_gated_nand_latch.vcd");
+    $dumpvars(0, tb_sr_gated_nand_latch);
+    $monitor("Time=%0t EN=%b S=%b R=%b Q=%b Qbar=%b",
+              $time, EN, S, R, Q, Qbar);
+    EN = 0; S = 0; R = 0; #10;
+    EN = 1; S = 1; R = 0; #10;
+    EN = 1; S = 0; R = 0; #10;
+    EN = 1; S = 0; R = 1; #10;
+    EN = 1; S = 0; R = 0; #10;
+    EN = 1; S = 1; R = 1; #10;
+    EN = 0; S = 1; R = 0; #10;
+    $finish;
+end
+endmodule
